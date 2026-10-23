@@ -1,6 +1,12 @@
 import os
+import sys
 import time
 from pathlib import Path
+
+if sys.platform == "win32":
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+
 from dotenv import load_dotenv
 from groq import Groq
 from pydantic import BaseModel, Field
@@ -315,9 +321,9 @@ for candidate in top_2:
         "%"
     )
 
-    print(candidate["details"])
+    print(json.dumps(candidate["details"], indent=2, ensure_ascii=False))
 
-print("LOWEST 2 CANDIDATES")
+print("\nLOWEST 2 CANDIDATES")
 for candidate in worst_2:
 
     print(
@@ -326,4 +332,4 @@ for candidate in worst_2:
         candidate["score"],
         "%"
     )
-    print(candidate["details"])
+    print(json.dumps(candidate["details"], indent=2, ensure_ascii=False))
