@@ -18,8 +18,38 @@ if not my_api_key:
     raise ValueError("API key kaha hai bhai")
 
 client=Groq(api_key=my_api_key)
+
+# Verify and print all available models from Groq
+def get_available_models(client):
+    try:
+        model_list = client.models.list()
+        return [m.id for m in model_list.data]
+    except Exception as e:
+        print(f"Warning: Could not fetch models list: {e}")
+        return []
+
+available_models = get_available_models(client)
+print("\n=== Available Groq Models ===")
+for m in available_models:
+    print(f" - {m}")
+print("=============================\n")
+
+preferred_models = ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b", "llama-3.3-70b-versatile"]
 model = "openai/gpt-oss-120b"
 
+if available_models and model not in available_models:
+    print(f"Model '{model}' is not currently available.")
+    fallback = next((m for m in preferred_models if m in available_models), None)
+    if fallback:
+        model = fallback
+        print(f"Switching to available model: '{model}'\n")
+    else:
+        chat_models = [m for m in available_models if not any(x in m for x in ["whisper", "guard", "safeguard"])]
+        if chat_models:
+            model = chat_models[0]
+            print(f"Falling back to available chat model: '{model}'\n")
+
+print(f"Using Model for parsing: {model}\n")
 
 job_description="""
 Description
